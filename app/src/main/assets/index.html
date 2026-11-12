@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+<title>Pixel Art</title>
+<style>
+body{margin:0;background:#222;color:#fff;font-family:sans-serif;text-align:center}
+canvas{background:#fff;margin-top:8px;touch-action:none;image-rendering:pixelated}
+button,input{margin:4px;padding:8px 12px;font-size:15px}
+</style></head><body>
+<div>
+<input type="color" id="c" value="#e53935">
+<button onclick="mode='draw'">✏️ আঁকুন</button>
+<button onclick="mode='erase'">🧽 মুছুন</button>
+<button onclick="clearAll()">🗑 পরিষ্কার</button>
+<button onclick="save()">💾 সেভ</button>
+</div>
+<canvas id="cv"></canvas>
+<script>
+const N=16,S=Math.min(innerWidth-16,400),P=S/N;
+const cv=document.getElementById('cv'),x=cv.getContext('2d');
+cv.width=cv.height=S;
+let mode='draw',down=false,g=Array.from({length:N},()=>Array(N).fill(null));
+function draw(){
+  x.clearRect(0,0,S,S);
+  for(let i=0;i<N;i++)for(let j=0;j<N;j++){
+    if(g[i][j]){x.fillStyle=g[i][j];x.fillRect(j*P,i*P,P,P)}
+    x.strokeStyle='#ddd';x.strokeRect(j*P,i*P,P,P);
+  }
+}
+function paint(e){
+  const r=cv.getBoundingClientRect(),t=e.touches?e.touches[0]:e;
+  const j=Math.floor((t.clientX-r.left)/P),i=Math.floor((t.clientY-r.top)/P);
+  if(i<0||j<0||i>=N||j>=N)return;
+  g[i][j]=mode=='draw'?document.getElementById('c').value:null;draw();
+}
+cv.addEventListener('pointerdown',e=>{down=true;paint(e)});
+cv.addEventListener('pointermove',e=>{if(down)paint(e)});
+addEventListener('pointerup',()=>down=false);
+function clearAll(){g.forEach(r=>r.fill(null));draw()}
+function save(){
+  const o=document.createElement('canvas');o.width=o.height=N*20;
+  const y=o.getContext('2d');
+  for(let i=0;i<N;i++)for(let j=0;j<N;j++)if(g[i][j]){y.fillStyle=g[i][j];y.fillRect(j*20,i*20,20,20)}
+  const a=document.createElement('a');a.download='pixel-art.png';a.href=o.toDataURL();a.click();
+}
+draw();
+</script></body></html>
