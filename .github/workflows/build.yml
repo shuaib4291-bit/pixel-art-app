@@ -24,3 +24,19 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./app/src/main  # যেখানে আপনার index.html আছে (আপনার পাথ অনুযায়ী ঠিক করে নিন)
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write   # মূল পরিবর্তন: gh-pages ব্রাঞ্চে পুশ করার অনুমতি দিন
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # ... আপনার অন্যান্য ধাপ ...
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./app/src/main
