@@ -1,29 +1,26 @@
-name: Build APK
+name: Deploy Static Web App
 
 on:
   push:
-    branches: [ main, master ]
-  workflow_dispatch:
+    branches: [ main ]
 
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      - uses: actions/setup-java@v5
+      # আপনার সাইটটি তৈরি বা কপি করার প্রয়োজন হলে এখানে কমান্ড দিতে পারেন
+      - name: Build Web App
+        run: |
+          echo "Building the web app..."
+          # এখানে কোনো npm build বা কপি কমান্ড দিতে পারেন
+
+      # (ঐচ্ছিক) GitHub Pages-এ ডেপ্লয় করতে চাইলে নিচের অংশটি ব্যবহার করুন
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
         with:
-          distribution: temurin
-          java-version: 17
-
-      - uses: gradle/actions/setup-gradle@v6
-        with:
-          gradle-version: 8.7  # 8.5 এর চেয়ে নতুন, আপনার প্রজেক্টের wrapper এর সাথে মিলিয়ে নিন
-
-      - name: Build debug APK
-        run: gradle assembleDebug --no-daemon
-
-      - uses: actions/upload-artifact@v4
-        with:
-          name: pixel-art-app-debug-apk
-          path: app/build/outputs/apk/debug/*.apk
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./app/src/main  # যেখানে আপনার index.html আছে (আপনার পাথ অনুযায়ী ঠিক করে নিন)
